@@ -89,6 +89,6 @@ McNeil, Frey,Embrechts, 2005, Quantitative Risk Management
 
 Redfern, McLean, 2014, Principal Component Analysis for Yield Curve Modelling Reproduction of out-of-sample yield curve
 
-International Association of Insurance Supervisors (IAIS), 2020. Level 2 Document: ICS Version 2.0 for the monitoring period.
+International Association of Insurance Supervisors (IAIS), 2020, ICS Version 2.0 for the monitoring period
 
 Schlütter, 2020, Scenario-based Measurement of Interest Rate Risks
