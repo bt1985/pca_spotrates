@@ -87,7 +87,7 @@ European Commission, 2015. Regulation 2015/35 2014, Directive 2009/138/EC on the
 
 McNeil, Frey,Embrechts, 2005, Quantitative Risk Management
 
-Redfern, McLean, 2014, Principal Component Analysis for Yield Curve Modelling Reproduction of out-of-sample yield curve
+Redfern, McLean, Moody's, 2014, Principal Component Analysis for Yield Curve Modelling Reproduction of out-of-sample yield curve
 
 International Association of Insurance Supervisors (IAIS), 2020, ICS Version 2.0 for the monitoring period
 
