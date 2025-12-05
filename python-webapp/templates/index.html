@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCA Yield Curve Stress Testing</title>
+    <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="date"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            margin: 20px 30px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .results {
+            display: none;
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .description {
+            color: #6c757d;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .plot-container {
+            margin-top: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 PCA Yield Curve Stress Testing</h1>
+            <p class="subtitle">Deriving Stress Scenarios from Yield Curves using Principal Component Analysis</p>
+        </header>
+
+        <div class="controls">
+            <div class="form-group">
+                <div class="input-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" value="2020-01-01">
+                </div>
+                <div class="input-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate">
+                </div>
+                <button id="analyzeBtn" onclick="performAnalysis()">Generate Stress Scenarios</button>
+            </div>
+        </div>
+
+        <div class="error" id="errorBox"></div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Analyzing yield curve data from ECB...</p>
+            <p style="font-size: 0.9em; color: #6c757d; margin-top: 10px;">This may take a few moments</p>
+        </div>
+
+        <div class="results" id="results">
+            <div class="stats" id="stats"></div>
+
+            <div class="section">
+                <h2 class="section-title">Yield Curve Evolution</h2>
+                <p class="description">
+                    The 3D surface shows the evolution of the Euro area yield curve over time.
+                    Data is sourced from the ECB Statistical Data Warehouse.
+                </p>
+                <div class="plot-container" id="yieldCurvePlot"></div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Principal Components</h2>
+                <p class="description">
+                    The first principal components explain most of the yield curve variation.
+                    PC1 represents the level, PC2 the slope, and PC3 the curvature.
+                </p>
+                <div class="plot-container" id="pcPlot"></div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Explained Variance</h2>
+                <p class="description">
+                    The first three principal components typically explain over 99% of the total variance in yield curve movements.
+                </p>
+                <div class="plot-container" id="variancePlot"></div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Stressed Scores</h2>
+                <p class="description">
+                    Rolling 99.5% quantiles of the principal component scores.
+                    These are used to generate adverse scenarios for stress testing.
+                </p>
+                <div class="plot-container" id="stressedScoresPlot"></div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Yield Curve Stress Scenarios</h2>
+                <p class="description">
+                    Stressed yield curves generated by applying the quantile stresses to each principal component individually.
+                </p>
+                <div class="plot-container" id="scenariosPlot"></div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Powered by ECB Data | Principal Component Analysis |
+            <a href="https://github.com/bt1985/pca_spotrates" target="_blank">GitHub Repository</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // Set default end date to today
+        document.getElementById('endDate').valueAsDate = new Date();
+
+        async function performAnalysis() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) {
+                showError('Please select both start and end dates');
+                return;
+            }
+
+            // Hide previous results and errors
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('errorBox').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('analyzeBtn').disabled = true;
+
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        start_date: startDate,
+                        end_date: endDate
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Analysis failed');
+                }
+
+                displayResults(result.data);
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('analyzeBtn').disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            // Display statistics
+            const stats = data.statistics;
+            const variancePC1to3 = (stats.variance_explained[0] +
+                                   stats.variance_explained[1] +
+                                   stats.variance_explained[2]) * 100;
+
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">Observations</div>
+                    <div class="stat-value">${stats.n_observations}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">PC1 Variance</div>
+                    <div class="stat-value">${(stats.variance_explained[0] * 100).toFixed(1)}%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">PC1-3 Variance</div>
+                    <div class="stat-value">${variancePC1to3.toFixed(1)}%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Date Range</div>
+                    <div class="stat-value" style="font-size: 1em;">${stats.date_range.start} to ${stats.date_range.end}</div>
+                </div>
+            `;
+
+            // Display plots
+            Plotly.newPlot('yieldCurvePlot', JSON.parse(data.yield_curve).data,
+                          JSON.parse(data.yield_curve).layout, {responsive: true});
+
+            Plotly.newPlot('pcPlot', JSON.parse(data.principal_components).data,
+                          JSON.parse(data.principal_components).layout, {responsive: true});
+
+            Plotly.newPlot('variancePlot', JSON.parse(data.explained_variance).data,
+                          JSON.parse(data.explained_variance).layout, {responsive: true});
+
+            Plotly.newPlot('stressedScoresPlot', JSON.parse(data.stressed_scores).data,
+                          JSON.parse(data.stressed_scores).layout, {responsive: true});
+
+            Plotly.newPlot('scenariosPlot', JSON.parse(data.stress_scenarios).data,
+                          JSON.parse(data.stress_scenarios).layout, {responsive: true});
+
+            document.getElementById('results').style.display = 'block';
+
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showError(message) {
+            const errorBox = document.getElementById('errorBox');
+            errorBox.textContent = '⚠️ Error: ' + message;
+            errorBox.style.display = 'block';
+
+            // Scroll to error
+            errorBox.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
