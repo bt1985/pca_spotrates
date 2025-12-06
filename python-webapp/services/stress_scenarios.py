@@ -159,8 +159,8 @@ class StressScenarioGenerator:
         scores_down = base_scores.copy()
         scores_down[pc_num - 1] = stressed_down[pc_num - 1]
 
-        # Reconstruct yield curves (using first 4 components as in R code)
-        n_comp = min(4, pca_model.n_components_)
+        # Reconstruct yield curves (using available components, max 4 as in R code)
+        n_comp = min(4, pca_model.n_components_, len(base_scores))
         components = pca_model.components_[:n_comp]
 
         curve_up = scores_up[:n_comp] @ components + mean_curve

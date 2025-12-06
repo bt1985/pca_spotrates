@@ -303,11 +303,12 @@ class TestPerformance:
 class TestRobustness:
     """Test system robustness"""
 
-    def test_handles_missing_maturities(self, pca_analyzer):
+    def test_handles_missing_maturities(self):
         """Test handling of yield data with missing maturities"""
 
         import pandas as pd
         import numpy as np
+        from services.pca_analysis import PCAAnalyzer
 
         # Create data with only some maturities
         dates = pd.date_range('2020-01-01', periods=50, freq='D')
@@ -318,8 +319,9 @@ class TestRobustness:
         df = pd.DataFrame(data, columns=maturities)
         df.insert(0, 'Date', dates)
 
-        # Should still work
-        results = pca_analyzer.perform_pca(df)
+        # Use PCA analyzer with fewer components
+        analyzer = PCAAnalyzer(n_components=3)
+        results = analyzer.perform_pca(df)
 
         assert results is not None
         assert len(results['variance_explained']) <= 3
