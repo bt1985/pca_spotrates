@@ -9,7 +9,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 import json
 
-from app import app as flask_app
+from app import app as flask_app, cache
 from services.ecb_api import ECBDataService
 from services.pca_analysis import PCAAnalyzer
 from services.stress_scenarios import StressScenarioGenerator
@@ -20,9 +20,20 @@ def app():
     """Create and configure Flask app for testing"""
     flask_app.config.update({
         'TESTING': True,
-        'SECRET_KEY': 'test-secret-key'
+        'SECRET_KEY': 'test-secret-key',
+        'CACHE_TYPE': 'SimpleCache',  # Use simple cache for tests
+        'CACHE_DEFAULT_TIMEOUT': 0  # Disable timeout in tests
     })
+
+    # Clear cache before each test
+    with flask_app.app_context():
+        cache.clear()
+
     yield flask_app
+
+    # Clear cache after each test
+    with flask_app.app_context():
+        cache.clear()
 
 
 @pytest.fixture
@@ -188,4 +199,16 @@ def api_request_data():
     return {
         'start_date': '2020-01-01',
         'end_date': '2020-12-31'
+    }
+
+
+@pytest.fixture
+def advanced_api_request_data():
+    """Sample API request data with advanced parameters"""
+    return {
+        'start_date': '2020-01-01',
+        'end_date': '2020-12-31',
+        'n_components': 3,
+        'stress_quantile': 0.99,
+        'rolling_window': 12
     }
