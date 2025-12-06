@@ -1,0 +1,212 @@
+# =============================================================================
+# .htaccess for Netcup Webhosting with Phusion Passenger
+# PCA Yield Curve Stress Testing Application
+# =============================================================================
+# IMPORTANT: Copy this file to .htaccess and adjust paths for your deployment
+
+# Enable Passenger (Python WSGI support)
+PassengerEnabled On
+
+# Python Version (adjust based on your Netcup Python version)
+# Common values: python3, python3.9, python3.10, python3.11
+PassengerPython /usr/bin/python3
+
+# WSGI Application Entry Point
+# This tells Passenger which file to use as the entry point
+# Default: passenger_wsgi.py in the same directory
+PassengerAppRoot /path/to/your/python-webapp
+PassengerStartupFile passenger_wsgi.py
+
+# Application Environment
+# Options: development, production
+# IMPORTANT: Use 'production' for live deployment!
+PassengerAppEnv production
+
+# Python Path
+# Add your application directory to Python path
+SetEnv PYTHONPATH /path/to/your/python-webapp
+
+# -----------------------------------------------------------------------------
+# Environment Variables
+# -----------------------------------------------------------------------------
+# Set your application configuration via environment variables
+# These override values in .env file
+
+# Demo Mode (set to 'false' for production with real ECB data)
+SetEnv DEMO_MODE false
+
+# Flask Configuration
+SetEnv FLASK_DEBUG false
+SetEnv FLASK_SECRET_KEY your-secret-key-change-me
+
+# Logging
+SetEnv LOG_LEVEL INFO
+SetEnv LOG_FORMAT simple
+
+# Caching (1 hour = 3600 seconds)
+SetEnv CACHE_TIMEOUT 3600
+SetEnv CACHE_TYPE simple
+
+# PCA Configuration
+SetEnv N_COMPONENTS 5
+SetEnv STRESS_QUANTILE 0.995
+SetEnv ROLLING_WINDOW_MONTHS 24
+
+# ECB API Configuration
+SetEnv ECB_API_TIMEOUT 30
+
+# -----------------------------------------------------------------------------
+# Performance & Optimization
+# -----------------------------------------------------------------------------
+
+# Enable Application Preloading
+# Reduces first-request latency
+PassengerPreStart http://yourdomain.com/
+
+# Minimum Instances (keep app warm)
+# Set to 1 or more to avoid cold starts
+PassengerMinInstances 1
+
+# Maximum Pool Size
+# Limits concurrent instances (adjust based on hosting plan)
+PassengerMaxPoolSize 4
+
+# Passenger Friendly Error Pages
+# Set to 'off' in production to show custom error pages
+PassengerFriendlyErrorPages on
+
+# Application Spawn Method
+# 'smart' is more memory efficient, 'direct' is simpler
+PassengerSpawnMethod smart
+
+# -----------------------------------------------------------------------------
+# URL Rewriting & Routing
+# -----------------------------------------------------------------------------
+
+# Enable mod_rewrite for clean URLs
+RewriteEngine On
+
+# Redirect HTTP to HTTPS (recommended for production)
+# Uncomment the following lines to enforce HTTPS
+# RewriteCond %{HTTPS} !=on
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Route all requests through the application
+# This ensures Flask handles all routes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ passenger_wsgi.py/$1 [QSA,L]
+
+# -----------------------------------------------------------------------------
+# Security Headers
+# -----------------------------------------------------------------------------
+
+# Prevent clickjacking
+Header always set X-Frame-Options "SAMEORIGIN"
+
+# XSS Protection
+Header always set X-XSS-Protection "1; mode=block"
+
+# Content Type Sniffing Protection
+Header always set X-Content-Type-Options "nosniff"
+
+# Referrer Policy
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+# Content Security Policy (adjust as needed)
+# Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.plot.ly; style-src 'self' 'unsafe-inline';"
+
+# -----------------------------------------------------------------------------
+# File Access & Security
+# -----------------------------------------------------------------------------
+
+# Prevent directory browsing
+Options -Indexes
+
+# Deny access to sensitive files
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Deny access to Python source files (security)
+<FilesMatch "\.(py|pyc|pyo|pyd|env)$">
+    Require all denied
+</FilesMatch>
+
+# Allow only specific files
+<FilesMatch "^(passenger_wsgi\.py)$">
+    Require all granted
+</FilesMatch>
+
+# Deny access to config and environment files
+<FilesMatch "^(.env|.env.example|config.py|requirements.txt)$">
+    Require all denied
+</FilesMatch>
+
+# -----------------------------------------------------------------------------
+# Compression & Caching
+# -----------------------------------------------------------------------------
+
+# Enable GZIP compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Browser Caching for Static Assets
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # Images
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+
+    # CSS and JavaScript
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+
+    # Fonts
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+
+    # HTML (don't cache)
+    ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# -----------------------------------------------------------------------------
+# Error Pages
+# -----------------------------------------------------------------------------
+
+# Custom Error Pages (optional)
+# Create these files in your application directory
+# ErrorDocument 404 /404.html
+# ErrorDocument 500 /500.html
+
+# -----------------------------------------------------------------------------
+# Logging (Passenger)
+# -----------------------------------------------------------------------------
+
+# Application Log Level
+# Options: 0 (least verbose) to 7 (most verbose)
+# For production: use 1 or 2
+PassengerLogLevel 2
+
+# Passenger Debug Logging (disable in production)
+PassengerDebugger off
+
+# -----------------------------------------------------------------------------
+# Example Minimal Configuration
+# -----------------------------------------------------------------------------
+# If the above is too complex, here's a minimal working .htaccess:
+#
+# PassengerEnabled On
+# PassengerPython /usr/bin/python3
+# PassengerAppRoot /path/to/your/python-webapp
+# PassengerAppEnv production
+# SetEnv DEMO_MODE false
+# SetEnv FLASK_SECRET_KEY your-secret-key-here
+# PassengerFriendlyErrorPages off
+#
+# Replace /path/to/your/python-webapp with your actual path
