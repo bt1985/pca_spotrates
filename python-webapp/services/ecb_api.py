@@ -7,6 +7,7 @@ import requests
 import pandas as pd
 from datetime import datetime
 import logging
+import os
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -27,12 +28,32 @@ class ECBDataService:
         "SR_27Y", "SR_28Y", "SR_29Y", "SR_30Y"
     ]
 
-    def __init__(self):
-        self.session = requests.Session()
-        self.session.headers.update({
-            'Accept': 'application/json',
-            'User-Agent': 'PCA-Yield-Curve-App/1.0'
-        })
+    def __init__(self, demo_mode=None):
+        """
+        Initialize ECB Data Service
+
+        Args:
+            demo_mode: Use demo data instead of ECB API (default: from environment)
+        """
+        # Check demo mode from environment or parameter
+        if demo_mode is None:
+            demo_mode = os.environ.get('DEMO_MODE', 'false').lower() == 'true'
+
+        self.demo_mode = demo_mode
+        self.demo_data_path = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            'demo_data',
+            'sample_yield_curve.csv'
+        )
+
+        if self.demo_mode:
+            logger.info("🎭 DEMO MODE: Using sample data instead of ECB API")
+        else:
+            self.session = requests.Session()
+            self.session.headers.update({
+                'Accept': 'application/json',
+                'User-Agent': 'PCA-Yield-Curve-App/1.0'
+            })
 
     def fetch_yield_curve(self, start_date: str, end_date: str) -> pd.DataFrame:
         """
@@ -45,6 +66,10 @@ class ECBDataService:
         Returns:
             DataFrame with dates as index and maturities as columns
         """
+        # Use demo data if in demo mode
+        if self.demo_mode:
+            return self._fetch_demo_data(start_date, end_date)
+
         try:
             # Build the data key for all maturities
             maturities_str = "+".join(self.MATURITIES)
@@ -167,6 +192,41 @@ class ECBDataService:
         except Exception as e:
             logger.error(f"Error parsing ECB response: {str(e)}")
             raise Exception(f"Failed to parse ECB data: {str(e)}")
+
+    def _fetch_demo_data(self, start_date: str, end_date: str) -> pd.DataFrame:
+        """
+        Fetch demo data from CSV file
+
+        Args:
+            start_date: Start date in YYYY-MM-DD format
+            end_date: End date in YYYY-MM-DD format
+
+        Returns:
+            DataFrame with dates and yield curve data
+        """
+        try:
+            logger.info(f"📊 Loading demo data from {self.demo_data_path}")
+
+            # Load demo data
+            df = pd.read_csv(self.demo_data_path)
+
+            # Convert Date column to datetime
+            df['Date'] = pd.to_datetime(df['Date'])
+
+            # Filter by date range
+            mask = (df['Date'] >= start_date) & (df['Date'] <= end_date)
+            df_filtered = df[mask].copy()
+
+            # Convert Date back to string format for consistency
+            df_filtered['Date'] = df_filtered['Date'].dt.strftime('%Y-%m-%d')
+
+            logger.info(f"✅ Loaded {len(df_filtered)} observations from demo data")
+
+            return df_filtered
+
+        except Exception as e:
+            logger.error(f"Error loading demo data: {str(e)}")
+            raise Exception(f"Failed to load demo data: {str(e)}")
 
     def get_latest_available_date(self) -> Optional[str]:
         """
