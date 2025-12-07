@@ -129,6 +129,7 @@ class PCAAnalyzer:
                     ),
                     camera=dict(eye=dict(x=1.25, y=-3, z=1.25))
                 ),
+                autosize=True,
                 height=900,
                 margin=dict(l=0, r=0, b=0, t=50)
             )
