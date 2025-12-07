@@ -98,6 +98,7 @@ class PCAAnalyzer:
                 y=y,
                 z=z,
                 colorscale='Viridis',
+                showscale=False,
                 name='Spot Rates',
                 hovertemplate='Date: %{x|%Y-%m-%d}<br>' +
                               'Maturity: %{y}<br>' +
