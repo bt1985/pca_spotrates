@@ -61,8 +61,20 @@ pip install -r requirements.txt
 ### 5. App starten
 
 **🎭 DEMO-MODUS (empfohlen für lokales Testen):**
+
+**Linux/Mac:**
 ```bash
 DEMO_MODE=true python app.py
+```
+
+**Windows PowerShell:**
+```powershell
+$env:DEMO_MODE="true"; python app.py
+```
+
+**Windows CMD:**
+```cmd
+set DEMO_MODE=true && python app.py
 ```
 
 **Oder mit ECB API (benötigt Internet):**
@@ -141,12 +153,23 @@ Sie sehen **5 interaktive Visualisierungen:**
 - Keine Firewall-Blockierung
 
 **.env-Datei erstellen:**
+
+**Linux/Mac:**
 ```bash
 cp .env.example .env
 # Bearbeite .env:
 DEMO_MODE=false
 FLASK_SECRET_KEY=dein-geheimer-schluessel
 CACHE_TIMEOUT=3600
+```
+
+**Windows:**
+```powershell
+Copy-Item .env.example .env
+# Bearbeite .env mit Notepad oder Editor:
+# DEMO_MODE=false
+# FLASK_SECRET_KEY=dein-geheimer-schluessel
+# CACHE_TIMEOUT=3600
 ```
 
 ---
@@ -306,13 +329,28 @@ taskkill /PID <PID> /F
 **Symptom:** `HTTPSConnectionPool: Max retries exceeded`
 
 **Lösung:** Wechsel zum Demo-Modus
+
+**Linux/Mac:**
 ```bash
 DEMO_MODE=true python app.py
 ```
 
+**Windows PowerShell:**
+```powershell
+$env:DEMO_MODE="true"; python app.py
+```
+
 **Oder** `.env`-Datei erstellen:
+
+**Linux/Mac:**
 ```bash
 echo "DEMO_MODE=true" > .env
+python app.py
+```
+
+**Windows PowerShell:**
+```powershell
+"DEMO_MODE=true" | Out-File -FilePath .env -Encoding utf8
 python app.py
 ```
 
@@ -472,14 +510,25 @@ Die Anwendung läuft erfolgreich lokal.
 ## 💡 Pro-Tipps
 
 ### Entwicklung mit Auto-Reload
-```bash
-# Flask Debug Mode aktivieren
-export FLASK_DEBUG=1  # Linux/Mac
-set FLASK_DEBUG=1     # Windows CMD
-$env:FLASK_DEBUG=1    # Windows PowerShell
 
+**Linux/Mac:**
+```bash
+export FLASK_DEBUG=1
 DEMO_MODE=true python app.py
 ```
+
+**Windows CMD:**
+```cmd
+set FLASK_DEBUG=1
+set DEMO_MODE=true && python app.py
+```
+
+**Windows PowerShell:**
+```powershell
+$env:FLASK_DEBUG=1
+$env:DEMO_MODE="true"; python app.py
+```
+
 ✨ Änderungen an Python-Files werden automatisch erkannt und die App neu geladen.
 
 ### Performance optimieren
