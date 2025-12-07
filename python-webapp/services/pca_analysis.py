@@ -106,14 +106,30 @@ class PCAAnalyzer:
             )])
 
             fig.update_layout(
-                title='Yield Curve Evolution',
+                title={
+                    'text': 'Yield Curve Evolution',
+                    'font': {'size': 24}
+                },
                 scene=dict(
-                    xaxis=dict(title='Date'),
-                    yaxis=dict(title='Maturity'),
-                    zaxis=dict(title='Yield (%)'),
+                    xaxis=dict(
+                        title='Date',
+                        titlefont=dict(size=16),
+                        tickfont=dict(size=12)
+                    ),
+                    yaxis=dict(
+                        title='Maturity',
+                        titlefont=dict(size=16),
+                        tickfont=dict(size=12)
+                    ),
+                    zaxis=dict(
+                        title='Yield (%)',
+                        titlefont=dict(size=16),
+                        tickfont=dict(size=12)
+                    ),
                     camera=dict(eye=dict(x=1.25, y=-3, z=1.25))
                 ),
-                height=600
+                height=900,
+                margin=dict(l=0, r=0, b=0, t=50)
             )
 
             return fig.to_json()
