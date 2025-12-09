@@ -85,10 +85,11 @@ Siehe [DEPLOYMENT.md](DEPLOYMENT.md) für detaillierte Anweisungen.
 
 ## 📊 Datenquelle
 
-**European Central Bank (ECB) Statistical Data Warehouse**
+**European Central Bank (ECB) Data Portal**
 - Datenreihe: Euro area AAA-rated government bonds
 - Laufzeiten: 3M bis 30Y (32 Maturities)
-- API: https://sdw-wsrest.ecb.europa.eu/
+- API: https://data-api.ecb.europa.eu/
+- Portal: https://data.ecb.europa.eu/
 
 ## 🔬 Methodik
 
@@ -262,7 +263,7 @@ Diese Python-App ist eine 1:1-Portierung der R-Shiny-App mit folgenden Verbesser
 
 - **GitHub Issues**: https://github.com/bt1985/pca_spotrates/issues
 - **Netcup Forum**: https://forum.netcup.de/
-- **ECB API Docs**: https://sdw-wsrest.ecb.europa.eu/
+- **ECB API Docs**: https://data.ecb.europa.eu/help/api/overview
 
 ---
 

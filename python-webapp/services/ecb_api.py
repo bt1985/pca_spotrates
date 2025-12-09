@@ -14,9 +14,9 @@ logger = logging.getLogger(__name__)
 
 
 class ECBDataService:
-    """Service to fetch yield curve data from ECB SDW REST API"""
+    """Service to fetch yield curve data from ECB Data Portal API"""
 
-    BASE_URL = "https://sdw-wsrest.ecb.europa.eu/service/data"
+    BASE_URL = "https://data-api.ecb.europa.eu/service/data"
 
     # ECB yield curve key for Euro area AAA-rated government bonds
     # Spot rates for maturities 3M to 30Y

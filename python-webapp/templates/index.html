@@ -246,6 +246,12 @@
 
         #yieldCurvePlot {
             width: 100% !important;
+            height: 900px !important;
+        }
+
+        #yieldCurvePlot .plotly {
+            width: 100% !important;
+            height: 100% !important;
         }
 
         .stats {
@@ -609,8 +615,12 @@
             `;
 
             // Display plots
-            Plotly.newPlot('yieldCurvePlot', JSON.parse(data.yield_curve).data,
-                          JSON.parse(data.yield_curve).layout, {responsive: true});
+            const yieldCurveData = JSON.parse(data.yield_curve);
+            const yieldCurveLayout = yieldCurveData.layout;
+            // Force full width
+            yieldCurveLayout.autosize = true;
+            Plotly.newPlot('yieldCurvePlot', yieldCurveData.data,
+                          yieldCurveLayout, {responsive: true, displayModeBar: true});
 
             Plotly.newPlot('pcPlot', JSON.parse(data.principal_components).data,
                           JSON.parse(data.principal_components).layout, {responsive: true});

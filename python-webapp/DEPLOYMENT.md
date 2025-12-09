@@ -295,7 +295,7 @@ https://forum.netcup.de/
 https://www.phusionpassenger.com/docs/
 
 ### ECB API Dokumentation
-https://sdw-wsrest.ecb.europa.eu/
+https://data.ecb.europa.eu/help/api/overview
 
 ## Update-Prozess
 

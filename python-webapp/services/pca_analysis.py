@@ -93,45 +93,93 @@ class PCAAnalyzer:
             y = self.maturities
             z = yield_matrix.T
 
+            # Custom colorscale for a more wave-like appearance
+            # Blue (low) -> Cyan -> Green -> Yellow -> Red (high)
+            colorscale = [
+                [0.0, '#0d47a1'],   # Dark Blue
+                [0.2, '#1976d2'],   # Blue
+                [0.35, '#42a5f5'],  # Light Blue
+                [0.5, '#4dd0e1'],   # Cyan
+                [0.65, '#66bb6a'],  # Green
+                [0.8, '#fdd835'],   # Yellow
+                [1.0, '#f4511e']    # Red-Orange
+            ]
+
             fig = go.Figure(data=[go.Surface(
                 x=x,
                 y=y,
                 z=z,
-                colorscale='Viridis',
+                colorscale=colorscale,
                 showscale=False,
                 name='Spot Rates',
                 hovertemplate='Date: %{x|%Y-%m-%d}<br>' +
                               'Maturity: %{y}<br>' +
                               'Spot Rate: %{z:.2f}%<br>' +
-                              '<extra></extra>'
+                              '<extra></extra>',
+                lighting=dict(
+                    ambient=0.6,
+                    diffuse=0.8,
+                    specular=0.3,
+                    roughness=0.5,
+                    fresnel=0.2
+                ),
+                lightposition=dict(
+                    x=10000,
+                    y=10000,
+                    z=10000
+                ),
+                contours=dict(
+                    z=dict(
+                        show=True,
+                        usecolormap=True,
+                        highlightcolor="white",
+                        project=dict(z=True)
+                    )
+                )
             )])
 
             fig.update_layout(
                 title={
                     'text': 'Yield Curve Evolution',
-                    'font': {'size': 24}
+                    'font': {'size': 24, 'color': '#333'}
                 },
                 scene=dict(
                     xaxis=dict(
                         title='Date',
-                        titlefont=dict(size=16),
-                        tickfont=dict(size=12)
+                        titlefont=dict(size=16, color='#555'),
+                        tickfont=dict(size=12),
+                        backgroundcolor='rgb(240, 240, 240)',
+                        gridcolor='white',
+                        showbackground=True
                     ),
                     yaxis=dict(
                         title='Maturity',
-                        titlefont=dict(size=16),
-                        tickfont=dict(size=12)
+                        titlefont=dict(size=16, color='#555'),
+                        tickfont=dict(size=12),
+                        backgroundcolor='rgb(240, 240, 240)',
+                        gridcolor='white',
+                        showbackground=True
                     ),
                     zaxis=dict(
                         title='Yield (%)',
-                        titlefont=dict(size=16),
-                        tickfont=dict(size=12)
+                        titlefont=dict(size=16, color='#555'),
+                        tickfont=dict(size=12),
+                        backgroundcolor='rgb(245, 245, 245)',
+                        gridcolor='white',
+                        showbackground=True
                     ),
-                    camera=dict(eye=dict(x=1.25, y=-3, z=1.25))
+                    camera=dict(
+                        eye=dict(x=1.8, y=-1.8, z=1.3),
+                        center=dict(x=0, y=0, z=-0.1)
+                    ),
+                    aspectmode='manual',
+                    aspectratio=dict(x=1.5, y=1, z=0.6)
                 ),
                 autosize=True,
                 height=900,
-                margin=dict(l=0, r=0, b=0, t=50)
+                margin=dict(l=20, r=20, b=20, t=70),
+                paper_bgcolor='white',
+                plot_bgcolor='white'
             )
 
             return fig.to_json()
@@ -185,21 +233,21 @@ class PCAAnalyzer:
             fig.add_trace(go.Bar(
                 x=pc_labels,
                 y=variance_explained,
-                name='Explained Variance',
+                name='Individual Variance',
                 marker_color='lightblue',
                 hovertemplate='%{x}<br>' +
-                              'Explained variance: %{y:.2%}<br>' +
+                              'Individual variance: %{y:.2%}<br>' +
                               '<extra></extra>'
             ))
 
-            # Line plot for cumulative variance
+            # Line plot for cumulative variance (same y-axis)
             fig.add_trace(go.Scatter(
                 x=pc_labels,
                 y=cumulative_variance,
                 mode='lines+markers',
                 name='Cumulative Variance',
-                yaxis='y2',
-                marker_color='red',
+                marker=dict(color='red', size=10),
+                line=dict(color='red', width=3),
                 hovertemplate='%{x}<br>' +
                               'Cumulative variance: %{y:.2%}<br>' +
                               '<extra></extra>'
@@ -209,17 +257,20 @@ class PCAAnalyzer:
                 title='Explained Variance by Principal Component',
                 xaxis_title='Principal Component',
                 yaxis=dict(
-                    title='Individual Variance',
-                    tickformat='.0%'
-                ),
-                yaxis2=dict(
-                    title='Cumulative Variance',
-                    overlaying='y',
-                    side='right',
-                    tickformat='.0%'
+                    title='Variance Explained (%)',
+                    tickformat='.0%',
+                    range=[0, 1.05]  # Add 5% padding at top to prevent cutoff
                 ),
                 hovermode='x unified',
-                height=400
+                height=450,  # Slightly taller for better visibility
+                showlegend=True,
+                legend=dict(
+                    orientation='h',
+                    yanchor='bottom',
+                    y=1.02,
+                    xanchor='right',
+                    x=1
+                )
             )
 
             return fig.to_json()

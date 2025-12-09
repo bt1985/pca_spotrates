@@ -46,7 +46,7 @@ class Config:
     # API Configuration
     # -------------------------------------------------------------------------
     ECB_API_TIMEOUT = get_int_env('ECB_API_TIMEOUT', 30)
-    ECB_API_BASE_URL = os.environ.get('ECB_API_BASE_URL', 'https://sdw-wsrest.ecb.europa.eu')
+    ECB_API_BASE_URL = os.environ.get('ECB_API_BASE_URL', 'https://data-api.ecb.europa.eu')
     ECB_BASE_URL = ECB_API_BASE_URL + '/service/data'  # Full URL for backward compatibility
 
     # Caching
