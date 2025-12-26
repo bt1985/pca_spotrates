@@ -309,7 +309,7 @@
             <div class="form-group">
                 <div class="input-group">
                     <label for="startDate">Start Date</label>
-                    <input type="date" id="startDate" value="2020-01-01" onchange="validateDates()">
+                    <input type="date" id="startDate" value="2023-12-26" onchange="validateDates()">
                     <div class="validation-error" id="startDateError"></div>
                 </div>
                 <div class="input-group">
@@ -331,7 +331,7 @@
                 <div class="form-group">
                     <div class="input-group">
                         <label for="nComponents">Number of PCs</label>
-                        <input type="number" id="nComponents" value="5" min="1" max="10" style="width: 100%; padding: 10px; border: 2px solid #dee2e6; border-radius: 8px;">
+                        <input type="number" id="nComponents" value="3" min="1" max="10" style="width: 100%; padding: 10px; border: 2px solid #dee2e6; border-radius: 8px;">
                         <small style="color: #6c757d; font-size: 0.85em;">Number of principal components to compute (1-10)</small>
                     </div>
                     <div class="input-group">
@@ -533,7 +533,7 @@
             document.getElementById('analyzeBtn').disabled = true;
 
             // Get advanced parameters
-            const nComponents = parseInt(document.getElementById('nComponents').value) || 5;
+            const nComponents = parseInt(document.getElementById('nComponents').value) || 3;
             const stressQuantile = parseFloat(document.getElementById('stressQuantile').value) || 0.995;
             const rollingWindow = parseInt(document.getElementById('rollingWindow').value) || 24;
 

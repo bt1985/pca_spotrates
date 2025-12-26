@@ -57,7 +57,7 @@ class Config:
     # -------------------------------------------------------------------------
     # PCA Analysis Configuration
     # -------------------------------------------------------------------------
-    N_COMPONENTS = get_int_env('N_COMPONENTS', 5)
+    N_COMPONENTS = get_int_env('N_COMPONENTS', 3)
     STRESS_QUANTILE = get_float_env('STRESS_QUANTILE', 0.995)
     ROLLING_WINDOW_MONTHS = get_int_env('ROLLING_WINDOW_MONTHS', 24)
     ROLLING_UNIT_DAYS = 30  # Fixed: days per month for calculations

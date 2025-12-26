@@ -201,7 +201,7 @@ class StressScenarioGenerator:
                         name=f'{pc} Stress Up',
                         line=dict(color='red'),
                         legendgroup=pc,
-                        showlegend=(i == 0),
+                        showlegend=True,
                         hovertemplate='Date: %{x|%Y-%m-%d}<br>' +
                                       f'99.5% Quantile up {pc}: ' + '%{y:.4f}<br>' +
                                       '<extra></extra>'
@@ -221,7 +221,7 @@ class StressScenarioGenerator:
                         fill='tonexty',
                         fillcolor='rgba(0,100,80,0.2)',
                         legendgroup=pc,
-                        showlegend=(i == 0),
+                        showlegend=True,
                         hovertemplate='Date: %{x|%Y-%m-%d}<br>' +
                                       f'99.5% Quantile down {pc}: ' + '%{y:.4f}<br>' +
                                       '<extra></extra>'
@@ -239,7 +239,7 @@ class StressScenarioGenerator:
                         name=f'{pc} Score',
                         line=dict(color='rgb(0,100,80)'),
                         legendgroup=pc,
-                        showlegend=(i == 0),
+                        showlegend=True,
                         hovertemplate='Date: %{x|%Y-%m-%d}<br>' +
                                       f'{pc} Score: ' + '%{y:.4f}<br>' +
                                       '<extra></extra>'
@@ -305,7 +305,7 @@ class StressScenarioGenerator:
                         name=f'{pc} Stress Up',
                         line=dict(color='red', dash='dash'),
                         legendgroup='up',
-                        showlegend=(i == 0),
+                        showlegend=True,
                         hovertemplate='Maturity: %{x}<br>' +
                                       'Stressed Yield Up: %{y:.2f}%<br>' +
                                       '<extra></extra>'
@@ -323,7 +323,7 @@ class StressScenarioGenerator:
                         name=f'{pc} Stress Down',
                         line=dict(color='blue', dash='dash'),
                         legendgroup='down',
-                        showlegend=(i == 0),
+                        showlegend=True,
                         hovertemplate='Maturity: %{x}<br>' +
                                       'Stressed Yield Down: %{y:.2f}%<br>' +
                                       '<extra></extra>'
