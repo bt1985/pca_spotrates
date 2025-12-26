@@ -34,6 +34,18 @@ function showDemoBadge() {
 }
 
 /**
+ * Toggle documentation visibility
+ */
+function toggleDocumentation() {
+    const docContent = document.getElementById('documentationContent');
+    if (docContent.style.display === 'none') {
+        docContent.style.display = 'block';
+    } else {
+        docContent.style.display = 'none';
+    }
+}
+
+/**
  * Toggle advanced options visibility
  */
 function toggleAdvancedOptions() {

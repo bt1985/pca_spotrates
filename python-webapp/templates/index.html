@@ -19,6 +19,88 @@
             <p class="subtitle">Deriving Stress Scenarios from Yield Curves using Principal Component Analysis</p>
         </header>
 
+        <!-- Documentation Section -->
+        <div class="documentation-section">
+            <div class="documentation-toggle-container">
+                <button onclick="toggleDocumentation()" class="documentation-btn">
+                    📖 Dokumentation & Methodologie
+                </button>
+            </div>
+
+            <div id="documentationContent" style="display: none;">
+                <div class="doc-content">
+                    <h3><span>📖</span> Überblick</h3>
+                    <p>
+                        Diese Web-App führt eine Hauptkomponentenanalyse (PCA) der Zinsstrukturkurve durch, um Stressszenarien für Stresstests abzuleiten.
+                        Im Rahmen der Bewertung von Aktiva und Passiva über ihre zukünftigen Cashflows sind Zinsstrukturkurven von größter Bedeutung.
+                        Die Zinsstrukturkurve zu einem bestimmten Zeitpunkt besteht aus mehreren Spot Rates für unterschiedliche Laufzeiten.
+                        Die Bewegung der Spot Rates über die Zeit für die verschiedenen Laufzeiten ist stark korreliert.
+                        Um Stressszenarien erstellen zu können, ist es entscheidend zu verstehen, wie sich die verschiedenen Spot Rates gemeinsam bewegen.
+                    </p>
+
+                    <h3><span>📊</span> Die Daten</h3>
+                    <p>
+                        Die Zinsstrukturkurve über den Zeitverlauf kann als dreidimensionale Fläche dargestellt werden, wobei die x-Achse die Zeit,
+                        die y-Achse die Laufzeit und die z-Achse den entsprechenden Spot Rate darstellt. Die Daten werden von der
+                        <strong>Europäischen Zentralbank (ECB)</strong> bezogen und zeigen die Euro-Zinsstrukturkurve.
+                    </p>
+
+                    <h3><span>⚖️</span> Regulatorischer Kontext</h3>
+                    <p>
+                        Viele regulatorische Ansätze betonen die Bedeutung des Zinsrisikos. Die Solvency II Standardformel verlangt
+                        ein Aufwärts- und ein Abwärtsszenario der Zinsstrukturkurve, die jeweils zu einer Neubewertung der zukünftigen
+                        Cashflows aus Aktiva und Passiva führen. Die International Association of Insurance Supervisors (IAIS) schlägt
+                        mehrere Stressszenarien vor, die das Niveau, die Steigung und die Krümmung der Zinsstrukturkurve verändern.
+                    </p>
+
+                    <h3><span>🔬</span> Technisches Setup</h3>
+                    <p>
+                        Die PCA reduziert hochkorrelierte und hochdimensionale Daten auf niedrigdimensionale Daten mit angemessener Approximation.
+                        Die Hauptkomponenten bilden ein orthonormales Basissystem eines neuen Koordinatensystems:
+                    </p>
+                    <ul>
+                        <li><strong>PC1 (Level):</strong> Erklärt typischerweise den Großteil der Varianz und repräsentiert das Niveau der Zinskurve</li>
+                        <li><strong>PC2 (Slope):</strong> Repräsentiert die Steigung der Zinskurve</li>
+                        <li><strong>PC3 (Curvature):</strong> Repräsentiert die Krümmung der Zinskurve</li>
+                    </ul>
+                    <p>
+                        Die ersten drei Hauptkomponenten erklären typischerweise über 99% der Gesamtvarianz in den Bewegungen der Zinsstrukturkurve.
+                        Zur Erstellung eines Stressszenarios werden die Scores der Hauptkomponenten mit gestressten Werten (z.B. 99,5%-Quantile) ersetzt
+                        und die PCA invertiert, um eine gestresste Zinsstrukturkurve zu erhalten.
+                    </p>
+
+                    <h3><span>💭</span> Diskussion</h3>
+                    <div class="discussion-grid">
+                        <div class="pro-section">
+                            <h4>✅ Vorteile</h4>
+                            <ul>
+                                <li>PCA ist eine effektive Methode zur Darstellung hochdimensionaler Daten mit wenigen erklärenden Variablen</li>
+                                <li>Vereinfachte Modellierung der Zinsstrukturkurve mit nur wenigen unkorrelierten Zufallsvariablen</li>
+                                <li>PCA ist eine nicht-parametrische Methode, daher sind keine Annahmen über die Verteilung erforderlich</li>
+                                <li>Ermöglicht die Erstellung von Aufwärts-/Abwärts-Stressszenarien für Niveau, Steigung und Krümmung</li>
+                            </ul>
+                        </div>
+                        <div class="contra-section">
+                            <h4>⚠️ Nachteile & Einschränkungen</h4>
+                            <ul>
+                                <li>PCA ist eine Korrelationsanalyse, daher ist eine stationäre Zeitreihe erforderlich</li>
+                                <li>Die erklärte Varianz ist das einzige Kriterium für die Auswahl der Hauptkomponenten</li>
+                                <li>Tail-Ereignisse, die für Stresstests verwendet werden, sind nur lineare Kombinationen der gewählten Hauptkomponenten</li>
+                                <li>Die Ergebnisse sind nicht stabil über die Zeit, da sich die Aufsichtsmaßnahmen ändern können</li>
+                                <li>Implizite Annahme, dass zukünftige Tail-Ereignisse die vergangenen nicht überschreiten werden</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3><span>📚</span> Weitere Informationen</h3>
+                    <p>
+                        Eine ausführliche Dokumentation mit mathematischen Details, Literaturverweisen und technischen Spezifikationen
+                        finden Sie im <a href="https://github.com/bt1985/pca_spotrates" target="_blank">GitHub Repository</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <!-- Controls Section -->
         <div class="controls">
             <div class="form-group">
