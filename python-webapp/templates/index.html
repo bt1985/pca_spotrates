@@ -4,307 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PCA Yield Curve Stress Testing</title>
+
+    <!-- External Libraries -->
     <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .controls {
-            padding: 30px;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e9ecef;
-        }
-
-        .form-group {
-            display: flex;
-            gap: 20px;
-            align-items: flex-end;
-            flex-wrap: wrap;
-        }
-
-        .input-group {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #495057;
-        }
-
-        input[type="date"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        input[type="date"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        button {
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        button:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 40px;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error {
-            display: none;
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            margin: 20px 30px;
-            border-radius: 8px;
-            border: 1px solid #f5c6cb;
-        }
-
-        .error strong {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 1.1em;
-        }
-
-        .error-details {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #f5c6cb;
-            font-size: 0.9em;
-        }
-
-        .warning {
-            display: none;
-            background: #fff3cd;
-            color: #856404;
-            padding: 15px;
-            margin: 20px 30px;
-            border-radius: 8px;
-            border: 1px solid #ffeaa7;
-        }
-
-        .demo-badge {
-            display: inline-block;
-            background: #17a2b8;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            margin-left: 10px;
-        }
-
-        .validation-error {
-            color: #dc3545;
-            font-size: 0.85em;
-            margin-top: 5px;
-            display: none;
-        }
-
-        .export-section {
-            display: flex;
-            gap: 15px;
-            margin: 30px 0;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .export-btn {
-            padding: 12px 25px;
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .export-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
-        }
-
-        .export-btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .results {
-            display: none;
-            padding: 30px;
-        }
-
-        .section {
-            margin-bottom: 40px;
-        }
-
-        .section-title {
-            font-size: 1.5em;
-            color: #333;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
-        }
-
-        .description {
-            color: #6c757d;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-
-        .plot-container {
-            margin-top: 20px;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            overflow: hidden;
-            background: white;
-            width: 100%;
-        }
-
-        #yieldCurvePlot {
-            width: 100% !important;
-            height: 900px !important;
-        }
-
-        #yieldCurvePlot .plotly {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .stat-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-
-        .stat-value {
-            font-size: 1.8em;
-            font-weight: 700;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            color: #6c757d;
-            font-size: 0.9em;
-        }
-
-        .footer a {
-            color: #667eea;
-            text-decoration: none;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="container">
+        <!-- Header Section -->
         <header>
             <h1>📊 PCA Yield Curve Stress Testing</h1>
             <p class="subtitle">Deriving Stress Scenarios from Yield Curves using Principal Component Analysis</p>
         </header>
 
+        <!-- Controls Section -->
         <div class="controls">
             <div class="form-group">
                 <div class="input-group">
@@ -321,45 +36,53 @@
             </div>
 
             <div style="margin-top: 20px; text-align: center;">
-                <button onclick="toggleAdvancedOptions()" style="background: #6c757d; padding: 8px 20px;">
+                <button onclick="toggleAdvancedOptions()" class="advanced-btn">
                     ⚙️ Advanced Options
                 </button>
             </div>
 
-            <div id="advancedOptions" style="display: none; margin-top: 20px; padding: 20px; background: white; border-radius: 8px; border: 1px solid #dee2e6;">
-                <h3 style="margin-bottom: 15px; color: #495057;">Advanced Configuration</h3>
+            <!-- Advanced Options -->
+            <div id="advancedOptions" style="display: none;">
+                <h3>Advanced Configuration</h3>
                 <div class="form-group">
                     <div class="input-group">
                         <label for="nComponents">Number of PCs</label>
-                        <input type="number" id="nComponents" value="3" min="1" max="10" style="width: 100%; padding: 10px; border: 2px solid #dee2e6; border-radius: 8px;">
-                        <small style="color: #6c757d; font-size: 0.85em;">Number of principal components to compute (1-10)</small>
+                        <input type="number" id="nComponents" value="3" min="1" max="10">
+                        <small>Number of principal components to compute (1-10)</small>
                     </div>
                     <div class="input-group">
                         <label for="stressQuantile">Stress Quantile</label>
-                        <input type="number" id="stressQuantile" value="0.995" min="0.9" max="0.999" step="0.001" style="width: 100%; padding: 10px; border: 2px solid #dee2e6; border-radius: 8px;">
-                        <small style="color: #6c757d; font-size: 0.85em;">Quantile for stress testing (0.9 = 90%, 0.995 = 99.5%)</small>
+                        <input type="number" id="stressQuantile" value="0.995" min="0.9" max="0.999" step="0.001">
+                        <small>Quantile for stress testing (0.9 = 90%, 0.995 = 99.5%)</small>
                     </div>
                     <div class="input-group">
                         <label for="rollingWindow">Rolling Window (months)</label>
-                        <input type="number" id="rollingWindow" value="24" min="6" max="60" style="width: 100%; padding: 10px; border: 2px solid #dee2e6; border-radius: 8px;">
-                        <small style="color: #6c757d; font-size: 0.85em;">Window size for rolling quantile (6-60 months)</small>
+                        <input type="number" id="rollingWindow" value="24" min="6" max="60">
+                        <small>Window size for rolling quantile (6-60 months)</small>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Warning Box -->
         <div class="warning" id="warningBox"></div>
+
+        <!-- Error Box -->
         <div class="error" id="errorBox"></div>
 
+        <!-- Loading Indicator -->
         <div class="loading" id="loading">
             <div class="spinner"></div>
             <p>Analyzing yield curve data from ECB...</p>
             <p style="font-size: 0.9em; color: #6c757d; margin-top: 10px;">This may take a few moments</p>
         </div>
 
+        <!-- Results Section -->
         <div class="results" id="results">
+            <!-- Statistics Cards -->
             <div class="stats" id="stats"></div>
 
+            <!-- Export Buttons -->
             <div class="export-section">
                 <button class="export-btn" onclick="exportData('csv')">
                     📄 Export CSV
@@ -369,6 +92,7 @@
                 </button>
             </div>
 
+            <!-- Yield Curve Evolution -->
             <div class="section">
                 <h2 class="section-title">Yield Curve Evolution</h2>
                 <p class="description">
@@ -378,6 +102,7 @@
                 <div class="plot-container" id="yieldCurvePlot"></div>
             </div>
 
+            <!-- Principal Components -->
             <div class="section">
                 <h2 class="section-title">Principal Components</h2>
                 <p class="description">
@@ -387,6 +112,7 @@
                 <div class="plot-container" id="pcPlot"></div>
             </div>
 
+            <!-- Explained Variance -->
             <div class="section">
                 <h2 class="section-title">Explained Variance</h2>
                 <p class="description">
@@ -395,6 +121,7 @@
                 <div class="plot-container" id="variancePlot"></div>
             </div>
 
+            <!-- Stressed Scores -->
             <div class="section">
                 <h2 class="section-title">Stressed Scores</h2>
                 <p class="description">
@@ -404,6 +131,7 @@
                 <div class="plot-container" id="stressedScoresPlot"></div>
             </div>
 
+            <!-- Stress Scenarios -->
             <div class="section">
                 <h2 class="section-title">Yield Curve Stress Scenarios</h2>
                 <p class="description">
@@ -413,308 +141,14 @@
             </div>
         </div>
 
+        <!-- Footer -->
         <footer class="footer">
             <p>Powered by ECB Data | Principal Component Analysis |
             <a href="https://github.com/bt1985/pca_spotrates" target="_blank">GitHub Repository</a></p>
         </footer>
     </div>
 
-    <script>
-        // Set default end date to today
-        document.getElementById('endDate').valueAsDate = new Date();
-
-        // Check if demo mode is active on page load
-        checkDemoMode();
-
-        function toggleAdvancedOptions() {
-            const advOptions = document.getElementById('advancedOptions');
-            if (advOptions.style.display === 'none') {
-                advOptions.style.display = 'block';
-            } else {
-                advOptions.style.display = 'none';
-            }
-        }
-
-        async function checkDemoMode() {
-            try {
-                const response = await fetch('/api/health');
-                const data = await response.json();
-                if (data.demo_mode) {
-                    showDemoBadge();
-                    showWarning('🎭 Demo Mode: Using sample data (2022-2023). For production, set DEMO_MODE=false.');
-                }
-            } catch (error) {
-                console.log('Could not check demo mode status');
-            }
-        }
-
-        function showDemoBadge() {
-            const header = document.querySelector('header h1');
-            header.innerHTML += '<span class="demo-badge">DEMO MODE</span>';
-        }
-
-        function validateDates() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const startError = document.getElementById('startDateError');
-            const endError = document.getElementById('endDateError');
-            const analyzeBtn = document.getElementById('analyzeBtn');
-
-            let isValid = true;
-
-            // Clear previous errors
-            startError.style.display = 'none';
-            endError.style.display = 'none';
-
-            if (!startDate || !endDate) {
-                return; // Don't validate if fields are empty
-            }
-
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            const today = new Date();
-            const minDate = new Date('2000-01-01');
-
-            // Check if start date is before end date
-            if (start >= end) {
-                endError.textContent = '⚠️ End date must be after start date';
-                endError.style.display = 'block';
-                isValid = false;
-            }
-
-            // Check if end date is not in the future
-            if (end > today) {
-                endError.textContent = '⚠️ End date cannot be in the future';
-                endError.style.display = 'block';
-                isValid = false;
-            }
-
-            // Check if start date is not too old
-            if (start < minDate) {
-                startError.textContent = '⚠️ Start date should not be before 2000';
-                startError.style.display = 'block';
-                isValid = false;
-            }
-
-            // Check if date range is at least 30 days
-            const daysDiff = (end - start) / (1000 * 60 * 60 * 24);
-            if (daysDiff < 30) {
-                endError.textContent = '⚠️ Date range should be at least 30 days for meaningful analysis';
-                endError.style.display = 'block';
-                isValid = false;
-            }
-
-            // Disable button if validation fails
-            analyzeBtn.disabled = !isValid;
-
-            return isValid;
-        }
-
-        async function performAnalysis() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-
-            // Validate inputs
-            if (!startDate || !endDate) {
-                showError('Please select both start and end dates',
-                         'Make sure to choose a date range for the analysis.');
-                return;
-            }
-
-            if (!validateDates()) {
-                return; // Validation errors are already shown
-            }
-
-            // Hide previous results and errors
-            document.getElementById('results').style.display = 'none';
-            document.getElementById('errorBox').style.display = 'none';
-            document.getElementById('warningBox').style.display = 'none';
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('analyzeBtn').disabled = true;
-
-            // Get advanced parameters
-            const nComponents = parseInt(document.getElementById('nComponents').value) || 3;
-            const stressQuantile = parseFloat(document.getElementById('stressQuantile').value) || 0.995;
-            const rollingWindow = parseInt(document.getElementById('rollingWindow').value) || 24;
-
-            try {
-                const response = await fetch('/api/analyze', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        start_date: startDate,
-                        end_date: endDate,
-                        n_components: nComponents,
-                        stress_quantile: stressQuantile,
-                        rolling_window: rollingWindow
-                    })
-                });
-
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.error || 'Analysis failed');
-                }
-
-                displayResults(result.data);
-
-            } catch (error) {
-                handleError(error, startDate, endDate);
-            } finally {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('analyzeBtn').disabled = false;
-            }
-        }
-
-        function handleError(error, startDate, endDate) {
-            let message = error.message;
-            let suggestion = '';
-
-            // Provide helpful suggestions based on error type
-            if (message.includes('proxy') || message.includes('Proxy')) {
-                suggestion = 'Network connectivity issue. If running locally, try enabling DEMO_MODE=true.';
-            } else if (message.includes('No data') || message.includes('empty')) {
-                suggestion = `No data available for the period ${startDate} to ${endDate}. Try a different date range (e.g., 2020-2024).`;
-            } else if (message.includes('index') || message.includes('bounds')) {
-                suggestion = 'Insufficient data for analysis. Try selecting a longer date range (at least 90 days recommended).';
-            } else if (message.includes('timeout') || message.includes('Timeout')) {
-                suggestion = 'Request timed out. The ECB API might be slow. Please try again.';
-            } else {
-                suggestion = 'Please check your date range and try again.';
-            }
-
-            showError(message, suggestion);
-        }
-
-        function displayResults(data) {
-            // Display statistics
-            const stats = data.statistics;
-            const variancePC1to3 = (stats.variance_explained[0] +
-                                   stats.variance_explained[1] +
-                                   stats.variance_explained[2]) * 100;
-
-            document.getElementById('stats').innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-label">Observations</div>
-                    <div class="stat-value">${stats.n_observations}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">PC1 Variance</div>
-                    <div class="stat-value">${(stats.variance_explained[0] * 100).toFixed(1)}%</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">PC1-3 Variance</div>
-                    <div class="stat-value">${variancePC1to3.toFixed(1)}%</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Date Range</div>
-                    <div class="stat-value" style="font-size: 1em;">${stats.date_range.start} to ${stats.date_range.end}</div>
-                </div>
-            `;
-
-            // Display plots
-            const yieldCurveData = JSON.parse(data.yield_curve);
-            const yieldCurveLayout = yieldCurveData.layout;
-            // Force full width
-            yieldCurveLayout.autosize = true;
-            Plotly.newPlot('yieldCurvePlot', yieldCurveData.data,
-                          yieldCurveLayout, {responsive: true, displayModeBar: true});
-
-            Plotly.newPlot('pcPlot', JSON.parse(data.principal_components).data,
-                          JSON.parse(data.principal_components).layout, {responsive: true});
-
-            Plotly.newPlot('variancePlot', JSON.parse(data.explained_variance).data,
-                          JSON.parse(data.explained_variance).layout, {responsive: true});
-
-            Plotly.newPlot('stressedScoresPlot', JSON.parse(data.stressed_scores).data,
-                          JSON.parse(data.stressed_scores).layout, {responsive: true});
-
-            Plotly.newPlot('scenariosPlot', JSON.parse(data.stress_scenarios).data,
-                          JSON.parse(data.stress_scenarios).layout, {responsive: true});
-
-            document.getElementById('results').style.display = 'block';
-
-            // Scroll to results
-            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function showError(message, suggestion = '') {
-            const errorBox = document.getElementById('errorBox');
-            errorBox.innerHTML = `
-                <strong>⚠️ Error</strong>
-                <div>${message}</div>
-                ${suggestion ? `<div class="error-details">💡 Suggestion: ${suggestion}</div>` : ''}
-            `;
-            errorBox.style.display = 'block';
-
-            // Scroll to error
-            errorBox.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function showWarning(message) {
-            const warningBox = document.getElementById('warningBox');
-            warningBox.innerHTML = message;
-            warningBox.style.display = 'block';
-        }
-
-        async function exportData(format) {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-
-            if (!startDate || !endDate) {
-                showError('Please perform an analysis first before exporting');
-                return;
-            }
-
-            try {
-                const endpoint = format === 'csv' ? '/api/export/csv' : '/api/export/excel';
-
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        start_date: startDate,
-                        end_date: endDate
-                    })
-                });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Export failed');
-                }
-
-                // Create a blob from the response
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-
-                // Extract filename from Content-Disposition header
-                const contentDisposition = response.headers.get('Content-Disposition');
-                let filename = `export_${startDate}_${endDate}.${format === 'csv' ? 'csv' : 'xlsx'}`;
-                if (contentDisposition) {
-                    const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
-                    if (filenameMatch) {
-                        filename = filenameMatch[1].replace(/"/g, '');
-                    }
-                }
-
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-
-                console.log(`${format.toUpperCase()} export successful`);
-
-            } catch (error) {
-                showError(`Export failed: ${error.message}`);
-            }
-        }
-    </script>
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
