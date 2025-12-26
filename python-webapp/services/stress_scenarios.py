@@ -286,8 +286,7 @@ class StressScenarioGenerator:
                         mode='lines+markers',
                         name='Current Yield Curve',
                         line=dict(color='black'),
-                        legendgroup='original',
-                        showlegend=(i == 0),
+                        showlegend=False,
                         hovertemplate='Maturity: %{x}<br>' +
                                       'Yield: %{y:.2f}%<br>' +
                                       '<extra></extra>'
@@ -304,8 +303,7 @@ class StressScenarioGenerator:
                         mode='lines+markers',
                         name=f'{pc} Stress Up',
                         line=dict(color='red', dash='dash'),
-                        legendgroup='up',
-                        showlegend=True,
+                        showlegend=False,
                         hovertemplate='Maturity: %{x}<br>' +
                                       'Stressed Yield Up: %{y:.2f}%<br>' +
                                       '<extra></extra>'
@@ -322,8 +320,7 @@ class StressScenarioGenerator:
                         mode='lines+markers',
                         name=f'{pc} Stress Down',
                         line=dict(color='blue', dash='dash'),
-                        legendgroup='down',
-                        showlegend=True,
+                        showlegend=False,
                         hovertemplate='Maturity: %{x}<br>' +
                                       'Stressed Yield Down: %{y:.2f}%<br>' +
                                       '<extra></extra>'
